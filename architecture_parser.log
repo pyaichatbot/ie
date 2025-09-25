@@ -1,0 +1,11 @@
+2025-09-25 07:25:29,902 - ArchitectureDiagramParser - INFO - test_logger:114 - Test info message
+2025-09-25 07:25:29,902 - ArchitectureDiagramParser - WARNING - test_logger:116 - Test warning message
+2025-09-25 07:26:36,095 - ArchitectureDiagramParser - INFO - test_logger:114 - Test info message
+2025-09-25 07:26:36,095 - ArchitectureDiagramParser - WARNING - test_logger:116 - Test warning message
+2025-09-25 07:26:38,905 - ArchitectureDiagramParser - INFO - initialize:94 - EasyOCR initialized successfully
+2025-09-25 07:26:38,905 - ArchitectureDiagramParser - INFO - initialize_engines:348 - Primary OCR engine initialized: easyocr
+2025-09-25 07:26:40,758 - ArchitectureDiagramParser - INFO - initialize:150 - Tesseract initialized successfully, version: 5.5.0
+2025-09-25 07:26:40,758 - ArchitectureDiagramParser - INFO - initialize_engines:360 - Fallback OCR engine initialized: tesseract
+2025-09-25 07:26:40,897 - ArchitectureDiagramParser - INFO - initialize:215 - RapidOCR initialized successfully
+2025-09-25 07:26:40,897 - ArchitectureDiagramParser - INFO - initialize_engines:360 - Fallback OCR engine initialized: rapidocr
+2025-09-25 07:26:40,897 - ArchitectureDiagramParser - INFO - __init__:43 - Architecture Diagram Parser initialized successfully

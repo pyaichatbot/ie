@@ -1,0 +1,39 @@
+# Core dependencies for Architecture Diagram Parser
+# Computer Vision and Image Processing
+opencv-python>=4.8.0
+numpy>=1.24.0
+scipy>=1.10.0
+Pillow>=9.5.0
+
+# Machine Learning and Clustering
+scikit-learn>=1.3.0
+
+# OCR Engines (optional - install as needed)
+easyocr>=1.7.0
+pytesseract>=0.3.10
+rapidocr-onnxruntime>=1.3.0
+paddleocr>=2.7.0
+
+# Data Processing and Utilities
+pandas>=2.0.0
+pathlib2>=2.3.7
+
+# Development and Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Optional: For advanced image processing
+# opencv-contrib-python>=4.8.0  # Uncomment if needed for additional OpenCV features
+
+# Optional: For GPU acceleration (if available)
+# torch>=2.0.0  # Uncomment if using PyTorch-based models
+# torchvision>=0.15.0  # Uncomment if using PyTorch-based models
+
+# System dependencies (install separately):
+# - Tesseract OCR: https://github.com/tesseract-ocr/tesseract
+# - For Ubuntu/Debian: sudo apt-get install tesseract-ocr
+# - For macOS: brew install tesseract
+# - For Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki

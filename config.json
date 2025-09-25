@@ -1,0 +1,41 @@
+{
+  "preprocessing": {
+    "upscale_factor": 2.5,
+    "upscale_interpolation": 2,
+    "enhance_contrast": true,
+    "clahe_clip_limit": 3.0,
+    "clahe_tile_grid_size": [8, 8],
+    "deskew_enabled": true,
+    "deskew_angle_threshold": 0.5
+  },
+  "tiling": {
+    "tile_size": 1024,
+    "overlap": 128,
+    "min_tile_area": 65536
+  },
+  "ocr": {
+    "primary_engine": "easyocr",
+    "fallback_engines": ["tesseract", "rapidocr"],
+    "confidence_threshold": 0.6,
+    "min_text_height": 8,
+    "max_text_height": 200
+  },
+  "arrow_detection": {
+    "hough_threshold": 50,
+    "min_line_length": 30,
+    "max_line_gap": 10,
+    "connection_distance_threshold": 20
+  },
+  "graph_processing": {
+    "node_merge_distance": 50,
+    "edge_snap_distance": 30,
+    "min_node_area": 100
+  },
+  "diagnostics": {
+    "log_level": "INFO",
+    "log_file": "architecture_parser.log",
+    "performance_tracking": true,
+    "save_intermediate_results": false,
+    "intermediate_results_dir": "./debug_output"
+  }
+}
