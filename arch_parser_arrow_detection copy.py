@@ -96,16 +96,16 @@ class ArrowDetector:
     
     def _detect_line_segments(self, gray_image: np.ndarray) -> List[Tuple[Point, Point]]:
         """Detect straight line segments using Hough Line Transform"""
-        # More conservative edge detection
-        edges = cv2.Canny(gray_image, 100, 200, apertureSize=3)
+        # Edge detection
+        edges = cv2.Canny(gray_image, 50, 150, apertureSize=3)
         
-        # More restrictive Hough line detection
+        # Hough line detection
         lines = cv2.HoughLinesP(
             edges,
             rho=1,
             theta=np.pi/180,
-            threshold=self.config.hough_threshold * 2,  # Double the threshold for fewer false positives
-            minLineLength=self.config.min_line_length * 2,  # Require longer lines
+            threshold=self.config.hough_threshold,
+            minLineLength=self.config.min_line_length,
             maxLineGap=self.config.max_line_gap
         )
         
@@ -126,9 +126,8 @@ class ArrowDetector:
         arrowheads.extend(template_arrowheads)
         
         # Method 2: Contour-based detection for various arrowhead shapes
-        # TEMPORARILY DISABLED due to excessive false positives
-        # contour_arrowheads = self._detect_arrowheads_by_contour(gray_image)
-        # arrowheads.extend(contour_arrowheads)
+        contour_arrowheads = self._detect_arrowheads_by_contour(gray_image)
+        arrowheads.extend(contour_arrowheads)
         
         # Remove duplicates
         arrowheads = self._remove_duplicate_points(arrowheads, min_distance=10)
@@ -146,8 +145,8 @@ class ArrowDetector:
             # Template matching
             result = cv2.matchTemplate(gray_image, template, cv2.TM_CCOEFF_NORMED)
             
-            # Find matches above threshold - increased for better precision
-            threshold = 0.8
+            # Find matches above threshold
+            threshold = 0.6
             locations = np.where(result >= threshold)
             
             for pt in zip(*locations[::-1]):  # Switch x and y coordinates
@@ -161,30 +160,24 @@ class ArrowDetector:
         """Detect arrowheads by analyzing contours for triangular shapes"""
         arrowheads = []
         
-        # More conservative edge detection to reduce noise
-        edges = cv2.Canny(gray_image, 150, 250)
+        # Edge detection and contours
+        edges = cv2.Canny(gray_image, 100, 200)
         contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         
         for contour in contours:
-            # More restrictive area filtering for arrowheads
+            # Filter by area
             area = cv2.contourArea(contour)
-            if area < 50 or area > 200:  # Much more restrictive range
+            if area < 20 or area > 500:  # Reasonable arrowhead size
                 continue
             
-            # Check aspect ratio to filter out non-arrowhead shapes
-            x, y, w, h = cv2.boundingRect(contour)
-            aspect_ratio = w / h if h > 0 else 0
-            if aspect_ratio < 0.3 or aspect_ratio > 3.0:  # Arrowheads should be roughly square-ish
-                continue
-            
-            # More conservative contour approximation
-            epsilon = 0.01 * cv2.arcLength(contour, True)  # Reduced from 0.02
+            # Approximate contour
+            epsilon = 0.02 * cv2.arcLength(contour, True)
             approx = cv2.approxPolyDP(contour, epsilon, True)
             
-            # Stricter vertex count requirement - only accept exactly triangular shapes
-            if len(approx) == 3:
-                # Enhanced triangular shape validation
-                if self._is_valid_arrowhead_shape(approx, contour):
+            # Look for triangular shapes (3-4 vertices)
+            if len(approx) >= 3 and len(approx) <= 5:
+                # Check if shape is roughly triangular
+                if self._is_triangular_shape(approx):
                     # Get centroid
                     M = cv2.moments(contour)
                     if M["m00"] != 0:
@@ -193,51 +186,6 @@ class ArrowDetector:
                         arrowheads.append(Point(cx, cy))
         
         return arrowheads
-    
-    def _is_valid_arrowhead_shape(self, approx_contour, original_contour) -> bool:
-        """Enhanced validation for arrowhead shapes"""
-        if len(approx_contour) != 3:
-            return False
-        
-        points = approx_contour.reshape(-1, 2)
-        
-        # Calculate all angles in the triangle
-        angles = []
-        for i in range(3):
-            p1 = points[i]
-            p2 = points[(i + 1) % 3]
-            p3 = points[(i + 2) % 3]
-            
-            # Calculate angle at p2
-            v1 = p1 - p2
-            v2 = p3 - p2
-            
-            # Calculate angle
-            cos_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2) + 1e-6)
-            angle = np.arccos(np.clip(cos_angle, -1, 1)) * 180 / np.pi
-            angles.append(angle)
-        
-        # Check for proper arrowhead characteristics
-        # 1. Must have at least one sharp angle (< 60 degrees) - this is the arrow tip
-        # 2. Must have at least one obtuse angle (> 120 degrees) - this is the arrow base
-        sharp_angles = sum(1 for angle in angles if angle < 60)
-        obtuse_angles = sum(1 for angle in angles if angle > 120)
-        
-        if sharp_angles < 1 or obtuse_angles < 1:
-            return False
-        
-        # Check solidity (ratio of contour area to convex hull area)
-        # Arrowheads should be relatively solid shapes
-        hull = cv2.convexHull(original_contour)
-        hull_area = cv2.contourArea(hull)
-        contour_area = cv2.contourArea(original_contour)
-        
-        if hull_area > 0:
-            solidity = contour_area / hull_area
-            if solidity < 0.7:  # Arrowheads should be fairly solid
-                return False
-        
-        return True
     
     def _create_arrowhead_templates(self) -> List[np.ndarray]:
         """Create arrowhead templates for template matching"""
