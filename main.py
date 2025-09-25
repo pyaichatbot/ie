@@ -13,7 +13,7 @@ import json
 # Add current directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from arch_parser_config import ArchitectureDiagramConfig, DEFAULT_CONFIG
+from arch_parser_config import ArchitectureDiagramConfig, DEFAULT_CONFIG, LogLevel
 from diagnostics import DiagnosticsLogger
 from arch_parser_models import ProcessingResult, ArchitectureGraph
 from arch_parser_ocr import MultiEngineOCR
@@ -266,7 +266,7 @@ Examples:
     
     # Override config with command line arguments
     if args.debug:
-        config.diagnostics.log_level = config.diagnostics.LogLevel.DEBUG
+        config.diagnostics.log_level = LogLevel.DEBUG
     if args.save_intermediate:
         config.diagnostics.save_intermediate_results = True
     if args.log_file:
